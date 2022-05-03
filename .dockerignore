@@ -1,4 +1,5 @@
 .bundle
 .git 
 /tmp/*
+node_modules
 vendor/bundle
