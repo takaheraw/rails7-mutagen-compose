@@ -48,13 +48,13 @@ jobs:
 
       - name: Rename coverage file
         run: |
-          mkdir ./coverage_results
-          cp ./coverage/.resultset.json ./coverage_results/.resultset-user.json
+          mkdir ./coverage_results1
+          cp ./coverage/.resultset.json ./coverage_results1/.resultset-user.json
 
       - uses: actions/upload-artifact@v3
         with:
-          name: coverage_results
-          path: ./coverage_results/.resultset-user.json
+          name: coverage_results1
+          path: ./coverage_results1/.resultset-user.json
 
   rspec2:
     runs-on: ubuntu-latest
@@ -99,6 +99,10 @@ jobs:
 
       - name: Rename coverage file
         run: |
-          mkdir ./coverage_results
-          cp ./coverage/.resultset.json ./coverage_results/.resultset-admin.json
-          cp ./coverage/.resultset.json ./coverage/.resultset-user.json
+          mkdir ./coverage_results2
+          cp ./coverage/.resultset.json ./coverage_results2/.resultset-admin.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage_results2
+          path: ./coverage_results2/.resultset-admin.json
