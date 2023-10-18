@@ -17,6 +17,8 @@ comment:
   if: is_pull_request
 summary:
   if: true
+body:
+  if: is_pull_request
 report:
   if: is_default_branch
   datastores:
