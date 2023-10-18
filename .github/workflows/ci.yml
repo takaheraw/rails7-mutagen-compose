@@ -109,6 +109,20 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+    env:
+      RAILS_ENV: test
+      DB_USER: root
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
     needs:
       - rspec1
       - rspec2
