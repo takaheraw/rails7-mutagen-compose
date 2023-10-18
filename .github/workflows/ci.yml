@@ -163,7 +163,7 @@ jobs:
       - run: ls -alh simplecov-resultset
 
       - name: merge coverage
-        run: bundle exec rails coverage:report
+        run: RAILS_ENV=development bundle exec rails coverage:report
 
       - uses: actions/upload-artifact@v3
         with:
