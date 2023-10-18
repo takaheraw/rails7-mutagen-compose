@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  rspec:
+  rspec1:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:
@@ -44,4 +44,65 @@ jobs:
           bundle exec rails db:migrate
 
       - name: Run rspec
-        run: bundle exec rspec
+        run: bundle exec rspec spec/models/user_spec.rb
+
+      - name: Rename coverage file
+        run: |
+          mkdir ./coverage_results
+          cp ./coverage/.resultset.json ./coverage_results/.resultset-user.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage_results
+          path: ./coverage_results/.resultset-user.json
+
+  rspec2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+    env:
+      RAILS_ENV: test
+      DB_USER: root
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Database create and migrate
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:migrate
+
+      - name: Run rspec
+        run: bundle exec rspec spec/models/admin_spec.rb
+
+      - name: Rename coverage file
+        run: |
+          mkdir ./coverage_results
+          cp ./coverage/.resultset.json ./coverage_results/.resultset-admin.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage_results
+          path: ./coverage_results/.resultset-admin.json
