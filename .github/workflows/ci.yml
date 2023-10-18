@@ -101,8 +101,4 @@ jobs:
         run: |
           mkdir ./coverage_results
           cp ./coverage/.resultset.json ./coverage_results/.resultset-admin.json
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: coverage_results
-          path: ./coverage_results/.resultset-admin.json
+          cp ./coverage/.resultset.json ./coverage/.resultset-user.json
