@@ -120,6 +120,7 @@ jobs:
         options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
     env:
       DB_USER: root
+      DB_NAME: rails7_mutagen_compose_development
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
     needs:
@@ -163,6 +164,9 @@ jobs:
 
       - name: merge coverage
         run: bundle exec rails coverage:report
+
+      -
+       uses: k1LoW/octocov-action@v0
 
       - uses: actions/upload-artifact@v3
         with:
