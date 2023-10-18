@@ -119,7 +119,6 @@ jobs:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
         options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
     env:
-      RAILS_ENV: test
       DB_USER: root
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
@@ -163,7 +162,7 @@ jobs:
       - run: ls -alh simplecov-resultset
 
       - name: merge coverage
-        run: RAILS_ENV=development bundle exec rails coverage:report
+        run: bundle exec rails coverage:report
 
       - uses: actions/upload-artifact@v3
         with:
