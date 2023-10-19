@@ -1,5 +1,7 @@
 # rails7-mutagen-compose
 
+![coverage](docs/coverage.svg)
+
 ## Initial setup
 
 ```

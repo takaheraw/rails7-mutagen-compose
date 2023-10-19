@@ -1,0 +1,175 @@
+name: Run rspec, rubocop
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  rspec1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+    env:
+      RAILS_ENV: test
+      DB_USER: root
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Database create and migrate
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:migrate
+
+      - name: Run rspec
+        run: bundle exec rspec spec/models/user_spec.rb
+
+      - name: Rename coverage file
+        run: |
+          mkdir ./coverage_results1
+          cp ./coverage/.resultset.json ./coverage_results1/.resultset-user.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage_results1
+          path: ./coverage_results1/.resultset-user.json
+
+  rspec2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+    env:
+      RAILS_ENV: test
+      DB_USER: root
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Database create and migrate
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:migrate
+
+      - name: Run rspec
+        run: bundle exec rspec spec/models/admin_spec.rb
+
+      - name: Rename coverage file
+        run: |
+          mkdir ./coverage_results2
+          cp ./coverage/.resultset.json ./coverage_results2/.resultset-admin.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage_results2
+          path: ./coverage_results2/.resultset-admin.json
+
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+    env:
+      DB_USER: root
+      DB_NAME: rails7_mutagen_compose_development
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+    needs:
+      - rspec1
+      - rspec2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Database create and migrate
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:migrate
+    
+      - run: mkdir simplecov-resultset
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage_results1
+          path: simplecov-resultset
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage_results2
+          path: simplecov-resultset
+      
+      - run: ls -alh simplecov-resultset
+
+      - name: merge coverage
+        run: bundle exec rails coverage:report
+
+      -
+       uses: k1LoW/octocov-action@v0
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage
