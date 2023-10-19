@@ -5,6 +5,8 @@ coverage:
     path: docs/coverage.svg
   paths:
     - coverage/.resultset.json
+push:
+  if: is_pull_request
 codeToTestRatio:
   code:
     - 'app/**/*.rb'
