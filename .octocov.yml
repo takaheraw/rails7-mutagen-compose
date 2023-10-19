@@ -6,7 +6,7 @@ coverage:
   paths:
     - coverage/.resultset.json
 push:
-  if: is_pull_request
+  if: is_default_branch
 codeToTestRatio:
   code:
     - 'app/**/*.rb'
